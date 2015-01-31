@@ -77,6 +77,7 @@ public class SpigotAutoReply {
 								Console.info("\tReplies: "
 										+ conv.getRepliesCount());
 								if (hasSend) {
+									Console.info("Waiting before sending to prevent spam ...");
 									Thread.sleep(15000);
 									hasSend = false;
 								}
