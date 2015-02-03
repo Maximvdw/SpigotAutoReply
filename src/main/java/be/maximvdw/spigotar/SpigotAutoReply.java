@@ -7,6 +7,7 @@ import be.maximvdw.spigotar.config.Configuration;
 import be.maximvdw.spigotar.ui.Console;
 import be.maximvdw.spigotsite.SpigotSiteCore;
 import be.maximvdw.spigotsite.api.SpigotSite;
+import be.maximvdw.spigotsite.api.exceptions.ConnectionFailedException;
 import be.maximvdw.spigotsite.api.user.Conversation;
 import be.maximvdw.spigotsite.api.user.User;
 import be.maximvdw.spigotsite.api.user.exceptions.InvalidCredentialsException;
@@ -48,8 +49,15 @@ public class SpigotAutoReply {
 		Console.info("Getting the latests private messages ...");
 		if (user == null)
 			return;
-		List<Conversation> conversations = SpigotSite.getAPI()
-				.getConversationManager().getConversations(getUser(), 20);
+		List<Conversation> conversations;
+		try {
+			conversations = SpigotSite.getAPI().getConversationManager()
+					.getConversations(getUser(), 20);
+		} catch (ConnectionFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
 		for (Conversation conv : conversations) {
 			Console.info("\t" + conv.getAuthor().getUsername() + ": "
 					+ conv.getTitle());
@@ -69,7 +77,9 @@ public class SpigotAutoReply {
 								.getConversations(user, 20);
 						boolean hasSend = false;
 						for (Conversation conv : latestConversations) {
-							if (!getConversations().contains(conv)) {
+							if (!getConversations().contains(conv)
+									&& (!conv.getAuthor().equals(user))
+									&& (conv.getRepliesCount() == 0)) {
 								Console.info("Received a new message:");
 								Console.info("\tTitle: " + conv.getTitle());
 								Console.info("\tAuthor: "
